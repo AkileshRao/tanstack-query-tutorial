@@ -1,6 +1,6 @@
 import React from 'react'
 import { useQuery } from '@tanstack/react-query'
-
+import { Link } from 'react-router-dom';
 const getPosts = async () => {
     const res = await fetch('https://jsonplaceholder.typicode.com/posts');
     return res.json();
@@ -9,7 +9,8 @@ const getPosts = async () => {
 const WithQuery = () => {
     const { isPending, error, data } = useQuery({
         queryKey: ['postData'],
-        queryFn: getPosts
+        queryFn: getPosts,
+        staleTime: 10000
     })
 
     if (isPending) {
@@ -22,6 +23,7 @@ const WithQuery = () => {
 
     return (
         <div className='m-4 max-w-[600px] w-4/5 mx-auto'>
+            <Link to='/withoutquery' className='bg-gray-300 block w-fit my-8 mx-auto text-center py-2 px-4 rounded hover:bg-gray-400 font-medium'>Go to without query</Link>
             <h1 className='text-3xl text-center my-8 font-bold text-gray-400'>Posts Data</h1>
             {data && data.map(post => {
                 return (

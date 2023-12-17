@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 const WithoutQuery = () => {
     const [data, setData] = useState([]);
@@ -33,6 +34,7 @@ const WithoutQuery = () => {
 
     return (
         <div className='m-4 max-w-[600px] w-4/5 mx-auto'>
+            <Link to='/withquery' className='bg-gray-300 block w-fit my-8 mx-auto text-center py-2 px-4 rounded hover:bg-gray-400 font-medium'>Go to with query</Link>
             <h1 className='text-3xl text-center my-8 font-bold text-gray-400'>Posts Data</h1>
             {data && data.map(post => {
                 return (
