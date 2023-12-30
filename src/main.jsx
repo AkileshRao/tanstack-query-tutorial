@@ -5,6 +5,7 @@ import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import WithQuery from './pages/WithQuery.jsx';
 import WithoutQuery from './pages/WithoutQuery.jsx';
+import Post from './pages/Post.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: '/withquery',
     element: <WithQuery />
+  },
+  {
+    path: '/withquery/:id',
+    element: <Post />
   }
 ]);
 
