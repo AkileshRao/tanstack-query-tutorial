@@ -2,19 +2,33 @@ import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import { useParams } from 'react-router-dom'
 
+const getComments = async (id) => {
+    const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}/comments`);
+    if (!res.ok) {
+        throw new Error('There was an error!')
+    }
+    return res.json();
+}
+
 const Post = () => {
     const { id } = useParams();
     const { isPending, error, data } = useQuery({
         queryKey: ['posts', id, { hello: 'world' }],
         queryFn: async ({ queryKey }) => {
-            console.log(queryKey);
-            return await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`)
-                .then(res => {
-                    return res.json()
-                })
+            const res = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+            if (!res.ok) {
+                throw new Error('There was an error!')
+            }
+            return res.json();
         },
         staleTime: 10000
     })
+
+    const { isPending: isCommentsPending, error: commentsError, data: comments } = useQuery({
+        queryKey: ['comments'],
+        queryFn: () => getComments(id),
+        enabled: !isPending
+    });
 
     if (isPending) {
         return <h1 className='text-3xl text-center my-8 font-bold text-gray-400'>Loading...</h1>;

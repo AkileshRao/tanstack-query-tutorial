@@ -6,11 +6,31 @@ const getPosts = async () => {
     return res.json();
 }
 
+const getUsers = async () => {
+    const res = await fetch('https://jsonplaceholder.typicode.com/users');
+    if (!res.ok) {
+        throw new Error('There was an error!')
+    }
+    return res.json();
+}
+
 const WithQuery = () => {
-    const { isPending, error, data } = useQuery({
-        queryKey: ['postData'],
-        queryFn: getPosts,
-        staleTime: 10000
+    // const { isPending, error, data } = useQuery({
+    //     queryKey: ['postData'],
+    //     queryFn: getPosts,
+    //     staleTime: 10000
+    // })
+
+    // const { isPending: isUsersPending, error: usersError, data: users } = useQuery({
+    //     queryKey: ['users'],
+    //     queryFn: getUsers
+    // });
+
+    const [{ isPending, error, data }, { isPending: isUsersPending, error: usersError, data: users }] = useQueries({
+        queries: [
+            { queryKey: ['posts'], queryFn: getPosts },
+            { queryKey: ['users'], queryFn: getUsers }
+        ]
     })
 
     if (isPending) {
