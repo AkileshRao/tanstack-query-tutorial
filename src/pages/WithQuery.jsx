@@ -1,5 +1,5 @@
 import React from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import { Link } from 'react-router-dom';
 const getPosts = async () => {
     const res = await fetch('https://jsonplaceholder.typicode.com/posts');
@@ -7,7 +7,7 @@ const getPosts = async () => {
 }
 
 const getUsers = async () => {
-    const res = await fetch('https://jsonplaceholder.typicode.com/users');
+    const res = await fetch('https://jsonplaceholder.typicode.com/ussers');
     if (!res.ok) {
         throw new Error('There was an error!')
     }
@@ -29,7 +29,7 @@ const WithQuery = () => {
     const [{ isPending, error, data }, { isPending: isUsersPending, error: usersError, data: users }] = useQueries({
         queries: [
             { queryKey: ['posts'], queryFn: getPosts },
-            { queryKey: ['users'], queryFn: getUsers }
+            { queryKey: ['users'], queryFn: getUsers, retryDelay: 2000 }
         ]
     })
 

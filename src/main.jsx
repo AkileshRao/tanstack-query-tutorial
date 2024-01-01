@@ -28,7 +28,13 @@ const router = createBrowserRouter([
   }
 ]);
 
-const client = new QueryClient();
+const client = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retryDelay: 2000
+    }
+  }
+});
 
 
 ReactDOM.createRoot(document.getElementById('root')).render(
