@@ -24,7 +24,7 @@ const Tasks = () => {
     }
 
     //CONVERT INTO MUTATION
-    const handleAdd = async () => {
+    const handleAdd = async ({ title, description, id, isComplete }) => {
         const res = await fetch('http://localhost:3000/addtask', {
             method: 'POST',
             headers: {
@@ -37,9 +37,20 @@ const Tasks = () => {
 
     const addMutation = useMutation({
         mutationFn: handleAdd,
-        onSuccess: () => {
-            queryClient.invalidateQueries(['tasks']);
-        }
+        onMutate: async (newTask) => {
+            await queryClient.cancelQueries({ queryKey: ['tasks'] });
+            const previousTasks = queryClient.getQueryData(['tasks']);
+            queryClient.setQueryData(['tasks'], (old) => {
+                return { tasks: [...old.tasks, newTask] }
+            });
+            return { previousTasks };
+        },
+        onError: (err, newTask, context) => {
+            queryClient.setQueryData(['tasks'], context.previousTasks)
+        },
+        onSettled: () => {
+            queryClient.invalidateQueries({ queryKey: ['tasks'] })
+        },
     })
 
     return (
@@ -49,7 +60,7 @@ const Tasks = () => {
                 <h1 className='text-center font-bold text-2xl my-4'>Add task</h1>
                 <input type="text" value={title} placeholder='Enter task title' className='p-2 mx-2 rounded' onChange={e => setTitle(e.target.value)} />
                 <input type="text" value={description} placeholder='Enter task description' className='p-2 mx-2 rounded' onChange={e => setDescription(e.target.value)} />
-                <button className='bg-blue-700 text-white font-bold px-4 py-2 rounded' onClick={() => addMutation.mutate()}>Submit</button>
+                <button className='bg-blue-700 text-white font-bold px-4 py-2 rounded' onClick={() => addMutation.mutate({ title, description, id: Math.random(), isComplete: false })}>Submit</button>
             </div>
             <hr className='border border-gray-300 w-full my-4' />
             <div className='w-full'>
@@ -59,7 +70,7 @@ const Tasks = () => {
                 {
                     data && data.tasks.map(task => {
                         return (
-                            <div key={task.id} className='flex justify-between items-center w-100 bg-gray-300 px-4 py-3 rounded my-2'>
+                            <div id={task.id} key={task.id} className='flex justify-between items-center w-100 bg-gray-300 px-4 py-3 rounded my-2'>
                                 <div>
                                     <h3 className='font-bold text-lg'>{task.title}</h3>
                                     <p>{task.description}</p>
@@ -69,6 +80,15 @@ const Tasks = () => {
                         )
                     })
                 }
+                {addMutation.isPending && (
+                    <div key={addMutation.variables.id} className='flex opacity-50 justify-between items-center w-100 bg-gray-300 px-4 py-3 rounded my-2'>
+                        <div>
+                            <h3 className='font-bold text-lg'>{addMutation.variables.title}</h3>
+                            <p>{addMutation.variables.description}</p>
+                        </div>
+                        <button className='bg-red-700 text-white font-bold px-4 py-1 rounded' onClick={() => handleDelete(addMutation.variables.id)}>Delete</button>
+                    </div>
+                )}
             </div>
         </div>
     )
